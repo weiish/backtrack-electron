@@ -4,7 +4,8 @@
   "description": "",
   "main": "main.js",
   "scripts": {
-    "start": "electron ."
+    "start": "electron .",
+    "dev": "nodemon index.js"
   },
   "keywords": [],
   "author": "",
@@ -13,6 +14,10 @@
     "chart.js": "^2.8.0",
     "csvtojson": "^2.0.10",
     "electron": "^6.0.4",
+    "electron-reload": "^1.5.0",
     "moment": "^2.24.0"
+  },
+  "devDependencies": {
+    "express": "^4.17.1"
   }
 }

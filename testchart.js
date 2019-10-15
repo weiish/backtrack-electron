@@ -1,7 +1,6 @@
-const os = require("os");
-const dataman = require("./src/file-manipulation/data-man");
 const Chart = require("chart.js");
 const path = require("path");
+const dataman = require("./src/data-man");
 var chart = null;
 
 async function getDataSet(filePath, settings) {
@@ -96,7 +95,7 @@ async function getDataSet(filePath, settings) {
 }
 
 async function drawChart(dataSet) {
-  let ctx = document.getElementById("chart").getContext("2d");
+  let ctx = document.getElementById("main-chart").getContext("2d");
   let chart = new Chart(ctx, {
     type: "bar",
     data: {
@@ -139,19 +138,85 @@ async function drawChart(dataSet) {
       }
     }
   });
+  return chart
+}
+
+async function updateChart(chart, dataSet) {
+  chart.data = {
+    labels: dataSet.labels,
+    datasets: [
+      {
+        label: "asdf",
+        data: dataSet.values,
+        backgroundColor: dataSet.bgColors,
+        borderColor: dataSet.bdColors,
+        borderWidth: 1
+      }
+    ]
+  }
+  chart.options = {
+    scaleShowValues: true,
+    scales: {
+      yAxes: [
+        {
+          scaleLabel: {
+            display: true,
+            labelString: dataSet.yLabel
+          },
+          ticks: {
+            beginAtZero: true
+          }
+        }
+      ],
+      xAxes: [
+        {
+          scaleLabel: {
+            display: true,
+            labelString: "Process Name"
+          },
+          ticks: {
+            autoSkip: false
+          }
+        }
+      ]
+    }
+  }
+  chart.update();
+
+}
+
+const redrawMainChart = async (chart, filterMinInput, fileDateInput) => {
+  const fileName = path.join("F:\\Timetracker\\logs", `${fileDateInput.value}-activity-log.csv`);
+  const dataSet = await getDataSet(fileName, {
+      unit: 'minutes',
+      type: 'window',
+      sort: 'descend',
+      min: parseInt(filterMinInput.value)
+  });
+  await updateChart(chart, dataSet)
 }
 
 const start = async () => {
   console.log("Starting!");
-  const fileName = path.join("F:\\Timetracker", `2019-04-06-activity-log.csv`);
+  const fileName = path.join("F:\\Timetracker\\logs", `2019-04-06-activity-log.csv`);
   const dataSet = await getDataSet(fileName, {
-      unit: 'hours',
+      unit: 'minutes',
       type: 'window',
       sort: 'descend',
       min: 1
   });
-  console.log(dataSet);
-  await drawChart(dataSet);
+  const chart = await drawChart(dataSet);
+  return chart
 };
 
-start();
+
+(async() => {
+let mainChart = await start();
+console.log(mainChart)
+const filterMinInput = document.getElementById("input-min")
+const fileDateInput = document.getElementById("input-date")
+filterMinInput.addEventListener("change", () => redrawMainChart(mainChart, filterMinInput, fileDateInput))
+fileDateInput.addEventListener("change", () => redrawMainChart(mainChart, filterMinInput, fileDateInput))
+
+})()
+

@@ -12,15 +12,98 @@
     <title>Backtrack</title>
     <meta name="description" content="">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <link rel="stylesheet" href="">
+    <link rel="stylesheet" type="text/css" href="./styles/main.css">
+    <link rel="stylesheet" type="text/css" href="./styles/navbar.css">
+    <link rel="stylesheet" type="text/css" href="./styles/content.css">
+    <link rel="stylesheet" type="text/css" href="./styles/settings.css">
 </head>
 
 <body>
-    
+
     <div class="container">
-        <canvas id="chart"></canvas>
+        <div id="navbar">
+            <div id="navbar-info">
+                <h1 id="navbar-info-title">Backtrack</h1>
+                <h2 id="navbar-info-version">v1.0</h2>
+            </div>
+            <div id="navbar-time">
+                <button id="btn-monthly" class="nav-time-button">Monthly</button>
+                <button id="btn-weekly" class="nav-time-button">Weekly</button>
+                <button id="btn-daily" class="nav-time-button">Daily</button>
+            </div>
+
+            <div id="navbar-commands">
+                <button id="btn-filepath" class="nav-command-button">Load Folder</button>
+            </div>
+
+
+
+
+        </div>
+        <div id="content">
+            <div class="col" id="col1">
+                <div id="settings">
+                    <div class="setting-section">
+                        <h1>Settings</h1>
+                    </div>
+                    <div id="date-selector" class="setting-section">
+                        <h2>Date</h2>
+                        <input id="input-date" type="date">
+                    </div>
+                    <div id="type-selector" class="setting-section">
+                        <h2>Type</h2>
+                        <div class="container-input">
+                            <input class="input-radio" id="input-window" type="radio" name="type" value="Window">
+                            <label for="input-window" class="input-label">Window</label>
+                        </div>
+                        <div class="container-input">
+                            <input class="input-radio" id="input-process" type="radio" name="type" value="Process">
+                            <label for="input-process" class="input-label">Process</label>
+                        </div>
+                        
+                    </div>
+                    <div id="units-selector" class="setting-section">
+                        <h2>Units</h2>
+                        <div class="container-input">
+                                <input class="input-radio" id="input-hours" type="radio" name="units" value="Hours">
+                                <label for="input-hours" class="input-label">Hours</label>
+                        </div>
+                        <div class="container-input">
+                                <input class="input-radio" id="input-minutes" type="radio" name="units" value="Hours">
+                                <label for="input-minutes" class="input-label">Minutes</label>
+                        </div>
+                    </div>
+                    <div id="filter-selector" class="setting-section">
+                        <h2>Filter</h2>
+                        <div id="min-selector">
+                            <label for="input-min">Min</label>
+                            <input id="input-min" type="text">
+                        </div>
+                        <div id="max-selector">
+                                <label for="input-max">Max</label>
+                            <input id="input-max" type="text">
+                        </div>
+                    </div>
+                </div>
+                <div id="main-chart-container">
+                    <h1>Main Chart</h1>
+                    <canvas id="main-chart"></canvas>
+                </div>
+            </div>
+
+            <div class="col" id="col2">
+                <div id="summary-chart-container">
+                    <h1>Summary Chart</h1>
+                    <canvas id="summary-chart"></canvas>
+                </div>
+                <div id="table-container">
+                    <h1>Table</h1>
+                </div>
+            </div>
+        </div>
+
     </div>
-    <script src="testchart.js"></script>
+    <script src="./testchart.js"></script>
 </body>
 
 </html>

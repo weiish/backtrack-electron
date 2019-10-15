@@ -1,8 +1,8 @@
 
 const path = require("path");
 const Chart = require('chart.js')
+const dataman = require('./src/data-man')
 const app = express();
-const dataman = require('./file-manipulation/data-man')
 const public_path = path.join(__dirname, "../public");
 const fs = require('fs')
 

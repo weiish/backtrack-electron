@@ -1,10 +1,12 @@
 
+
 const {app, BrowserWindow, ipcMain} = require('electron')
+require('electron-reload')(__dirname)
 
 function createWindow() {
     let win = new BrowserWindow({
-        width: 800,
-        height: 600,
+        width: 1440,
+        height: 900,
         webPreferences: {
             nodeIntegration: true
         }

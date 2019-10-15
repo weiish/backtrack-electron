@@ -1,0 +1,57 @@
+#navbar {
+    display: flex;
+	flex-direction: column;
+}
+
+#navbar-info {
+	display: flex;
+	flex-direction: column;
+	margin: none;
+}
+
+#navbar-info-title {
+	font-size: 2vh;
+}
+
+#navbar-info-version {
+	margin: 0;
+	padding: 0;
+	flex: 1 1 auto;
+	font-size: 2vh;
+}
+
+#navbar-time {
+	margin-top: 10%;
+	display: flex;
+	flex-direction: column;
+}
+
+#navbar-commands {
+	margin-top: 10%;
+	display:flex;
+	flex-direction: column;
+}
+
+.nav-time-button {
+    box-shadow:inset 0px -3px 7px 0px #29bbff;
+	background-color:#2dabf9;
+	border-radius:3px;
+	border:1px solid #0b0e07;
+	display:inline-block;
+	cursor:pointer;
+	color:#ffffff;
+	font-family:Arial;
+	font-size:3vh;
+	padding:10px 10px;
+	text-decoration:none;
+    text-shadow:0px 1px 0px #263666;
+    transition: all 0.2s;
+}
+
+.nav-time-button:hover {
+	background-color:#0688fa;
+}
+.nav-time-button:active {
+	position:relative;
+	top:1px;
+}
