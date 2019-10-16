@@ -33,6 +33,7 @@ async function getDataSet(filePath, settings) {
   }
 
   let labels = Object.keys(sums);
+  labels = labels.map(label => formatLabel(label, 35))
   let values = Object.values(sums);
   let min = -Infinity;
   let max = Infinity;
@@ -91,18 +92,18 @@ async function getDataSet(filePath, settings) {
     bgColors.push(`rgba(${r},${g},${b},0.3)`)
         bdColors.push(`rgba(${r},${g},${b},1)`)
   }
-  return { labels, values, bgColors, bdColors, yLabel };
+  return { labels, values, bgColors, bdColors, yLabel, filePath };
 }
 
 async function drawChart(dataSet) {
   let ctx = document.getElementById("main-chart").getContext("2d");
   let chart = new Chart(ctx, {
-    type: "bar",
+    type: "horizontalBar",
     data: {
       labels: dataSet.labels,
       datasets: [
         {
-          label: "asdf",
+          label: dataSet.filePath,
           data: dataSet.values,
           backgroundColor: dataSet.bgColors,
           borderColor: dataSet.bdColors,
@@ -111,6 +112,7 @@ async function drawChart(dataSet) {
       ]
     },
     options: {
+      aspectRatio: 1.4,
       scaleShowValues: true,
       scales: {
         yAxes: [
@@ -126,9 +128,10 @@ async function drawChart(dataSet) {
         ],
         xAxes: [
           {
+            position: 'top',
             scaleLabel: {
               display: true,
-              labelString: "Process Name"
+              labelString: "Minutes"
             },
             ticks: {
               autoSkip: false
@@ -146,7 +149,7 @@ async function updateChart(chart, dataSet) {
     labels: dataSet.labels,
     datasets: [
       {
-        label: "asdf",
+        label: dataSet.filePath,
         data: dataSet.values,
         backgroundColor: dataSet.bgColors,
         borderColor: dataSet.bdColors,
@@ -155,6 +158,7 @@ async function updateChart(chart, dataSet) {
     ]
   }
   chart.options = {
+    aspectRatio: 1.4,
     scaleShowValues: true,
     scales: {
       yAxes: [
@@ -170,6 +174,7 @@ async function updateChart(chart, dataSet) {
       ],
       xAxes: [
         {
+          position: 'top',
           scaleLabel: {
             display: true,
             labelString: "Process Name"
@@ -185,38 +190,124 @@ async function updateChart(chart, dataSet) {
 
 }
 
-const redrawMainChart = async (chart, filterMinInput, fileDateInput) => {
-  const fileName = path.join("F:\\Timetracker\\logs", `${fileDateInput.value}-activity-log.csv`);
+function calculateAspectRatio(canvasWidth, numElements) {
+
+}
+
+function formatLabel(str, maxwidth){
+  var sections = [];
+  var words = str.split(" ");
+  var temp = "";
+
+  words.forEach(function(item, index){
+      if(temp.length > 0)
+      {
+          var concat = temp + ' ' + item;
+
+          if(concat.length > maxwidth){
+              sections.push(temp);
+              temp = "";
+          }
+          else{
+              if(index == (words.length-1))
+              {
+                  sections.push(concat);
+                  return;
+              }
+              else{
+                  temp = concat;
+                  return;
+              }
+          }
+      }
+
+      if(index == (words.length-1))
+      {
+          sections.push(item);
+          return;
+      }
+
+      if(item.length < maxwidth) {
+          temp = item;
+      }
+      else {
+          sections.push(item);
+      }
+
+  });
+
+  return sections;
+}
+
+const redrawMainChart = async (chart, settings) => {
+  const fileName = path.join("F:\\Timetracker\\logs", `${settings.date}-activity-log.csv`);
   const dataSet = await getDataSet(fileName, {
-      unit: 'minutes',
-      type: 'window',
+      unit: settings.units,
+      type: settings.type,
       sort: 'descend',
-      min: parseInt(filterMinInput.value)
+      min: settings.min,
+      max: settings.max
   });
   await updateChart(chart, dataSet)
 }
 
 const start = async () => {
   console.log("Starting!");
-  const fileName = path.join("F:\\Timetracker\\logs", `2019-04-06-activity-log.csv`);
+  const fileName = path.join("F:\\Timetracker\\logs", `2019-10-15-activity-log.csv`);
   const dataSet = await getDataSet(fileName, {
       unit: 'minutes',
       type: 'window',
       sort: 'descend',
-      min: 1
+      min: 0,
+      max: Infinity
   });
   const chart = await drawChart(dataSet);
   return chart
 };
 
-
 (async() => {
 let mainChart = await start();
 console.log(mainChart)
+let settings = {
+  date: "2019-10-15",
+  min: 0,
+  type: "window",
+  unit: "hours"
+}
 const filterMinInput = document.getElementById("input-min")
+const filterMaxInput = document.getElementById("input-max")
 const fileDateInput = document.getElementById("input-date")
-filterMinInput.addEventListener("change", () => redrawMainChart(mainChart, filterMinInput, fileDateInput))
-fileDateInput.addEventListener("change", () => redrawMainChart(mainChart, filterMinInput, fileDateInput))
-
+const radioTypeWindow = document.getElementById("input-window")
+const radioTypeProcess = document.getElementById("input-process")
+const radioUnitsHours = document.getElementById("input-hours")
+const radioUnitsMinutes = document.getElementById("input-minutes")
+filterMinInput.addEventListener("change", () => {
+  settings.min = parseInt(filterMinInput.value) 
+  redrawMainChart(mainChart, settings)
+})
+filterMaxInput.addEventListener("change", () => {
+  settings.max = parseInt(filterMaxInput.value) 
+  redrawMainChart(mainChart, settings)
+})
+fileDateInput.addEventListener("change", () => {
+  settings.date = fileDateInput.value
+  redrawMainChart(mainChart, settings)
+})
+radioTypeWindow.addEventListener("change", () => {
+  settings.type="window" 
+  redrawMainChart(mainChart, settings)
+})
+radioTypeProcess.addEventListener("change", () => {
+  settings.type="process" 
+  redrawMainChart(mainChart, settings)
+})
+radioUnitsHours.addEventListener("change", () => {
+  settings.units="hours" 
+  redrawMainChart(mainChart, settings)
+})
+radioUnitsMinutes.addEventListener("change", () => {
+  settings.units="minutes"
+  redrawMainChart(mainChart, settings)
+})
 })()
 

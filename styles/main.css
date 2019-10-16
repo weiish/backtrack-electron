@@ -24,6 +24,5 @@ html, body {
 
 #content{
     flex: 1 1 auto;
-    max-width: 80%;
-    min-width: 80%;
+    overflow-y:auto;
 }
