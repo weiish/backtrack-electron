@@ -33,7 +33,7 @@ async function getDataSet(filePath, settings) {
   }
 
   let labels = Object.keys(sums);
-  labels = labels.map(label => formatLabel(label, 35))
+  labels = labels.map(label => formatLabel(label, 50));
   let values = Object.values(sums);
   let min = -Infinity;
   let max = Infinity;
@@ -54,6 +54,7 @@ async function getDataSet(filePath, settings) {
     });
   }
 
+  //SORTING
   if ("sort" in settings) {
     let list = [];
     for (var i = 0; i < values.length; i++) {
@@ -89,14 +90,22 @@ async function getDataSet(filePath, settings) {
     let r = parseInt(Math.random() * 255);
     let g = parseInt(Math.random() * 255);
     let b = parseInt(Math.random() * 255);
-    bgColors.push(`rgba(${r},${g},${b},0.3)`)
-        bdColors.push(`rgba(${r},${g},${b},1)`)
+    bgColors.push(`rgba(${r},${g},${b},0.3)`);
+    bdColors.push(`rgba(${r},${g},${b},1)`);
   }
   return { labels, values, bgColors, bdColors, yLabel, filePath };
 }
 
 async function drawChart(dataSet) {
-  let ctx = document.getElementById("main-chart").getContext("2d");
+  let canvas = document.getElementById("main-chart");
+  let ctx = canvas.getContext("2d");
+  console.log(canvas.width, dataSet.labels.length);
+  console.log(
+    `New aspect ratio is ${calculateAspectRatio(
+      canvas.width,
+      dataSet.labels.length
+    )}`
+  );
   let chart = new Chart(ctx, {
     type: "horizontalBar",
     data: {
@@ -112,7 +121,7 @@ async function drawChart(dataSet) {
       ]
     },
     options: {
-      aspectRatio: 1.4,
+      maintainAspectRatio: false,
       scaleShowValues: true,
       scales: {
         yAxes: [
@@ -128,7 +137,7 @@ async function drawChart(dataSet) {
         ],
         xAxes: [
           {
-            position: 'top',
+            position: "top",
             scaleLabel: {
               display: true,
               labelString: "Minutes"
@@ -141,7 +150,7 @@ async function drawChart(dataSet) {
       }
     }
   });
-  return chart
+  return chart;
 }
 
 async function updateChart(chart, dataSet) {
@@ -156,9 +165,9 @@ async function updateChart(chart, dataSet) {
         borderWidth: 1
       }
     ]
-  }
+  };
   chart.options = {
-    aspectRatio: 1.4,
+    maintainAspectRatio: false,
     scaleShowValues: true,
     scales: {
       yAxes: [
@@ -185,129 +194,147 @@ async function updateChart(chart, dataSet) {
         }
       ]
     }
-  }
+  };
   chart.update();
-
+  console.log("Chart after updating options");
+  console.log(chart);
 }
 
 function calculateAspectRatio(canvasWidth, numElements) {
-
+  const rowHeight = 10;
+  //We want each element to take up 25 px
+  //So total height should be = numElements * rowHeight
+  //Then the aspect ratio should be canvasWidth / totalHeight
+  return canvasWidth / (rowHeight * numElements);
 }
 
-function formatLabel(str, maxwidth){
+function formatLabel(str, maxWidth) {
   var sections = [];
   var words = str.split(" ");
-  var temp = "";
-
-  words.forEach(function(item, index){
-      if(temp.length > 0)
-      {
-          var concat = temp + ' ' + item;
-
-          if(concat.length > maxwidth){
-              sections.push(temp);
-              temp = "";
-          }
-          else{
-              if(index == (words.length-1))
-              {
-                  sections.push(concat);
-                  return;
-              }
-              else{
-                  temp = concat;
-                  return;
-              }
-          }
-      }
-
-      if(index == (words.length-1))
-      {
-          sections.push(item);
-          return;
-      }
-
-      if(item.length < maxwidth) {
-          temp = item;
-      }
-      else {
-          sections.push(item);
-      }
-
-  });
-
+  var section = "";
+  for (let i = 0; i < words.length; i++) {
+    let word = words[i];
+    if (word.length > maxWidth) {
+      word = word.substring(0, maxWidth - 3) + "...";
+    }
+    if (section.length + word.length > maxWidth) {
+      sections.push(section);
+      section = word;
+    } else if (i === words.length - 1) {
+      sections.push(section + " " + word);
+    } else {
+      section = section + " " + word;
+    }
+    if (sections.length === 3) {
+      return sections;
+    }
+  }
   return sections;
 }
 
-const redrawMainChart = async (chart, settings) => {
-  const fileName = path.join("F:\\Timetracker\\logs", `${settings.date}-activity-log.csv`);
+const redrawMainChart = async (chart, settings, mainChartDiv) => {
+  const chartRowHeight = 50;
+  const fileName = path.join(
+    "F:\\Timetracker\\logs",
+    `${settings.date}-activity-log.csv`
+  );
   const dataSet = await getDataSet(fileName, {
-      unit: settings.units,
-      type: settings.type,
-      sort: 'descend',
-      min: settings.min,
-      max: settings.max
+    unit: settings.units,
+    type: settings.type,
+    sort: "descend",
+    min: settings.min,
+    max: settings.max
   });
-  await updateChart(chart, dataSet)
-}
+  await updateChart(chart, dataSet);
+  mainChartDiv.style.minHeight = `${dataSet.labels.length * chartRowHeight +
+    100}px`;
+  mainChartDiv.style.maxHeight = `${dataSet.labels.length * chartRowHeight +
+    100}px`;
+  console.log("new chart");
+  console.log(chart);
+};
 
 const start = async () => {
   console.log("Starting!");
-  const fileName = path.join("F:\\Timetracker\\logs", `2019-10-15-activity-log.csv`);
+  const fileName = path.join(
+    "F:\\Timetracker\\logs",
+    `${formatDate(Date.now())}-activity-log.csv`
+  );
   const dataSet = await getDataSet(fileName, {
-      unit: 'minutes',
-      type: 'window',
-      sort: 'descend',
-      min: 0,
-      max: Infinity
+    unit: "minutes",
+    type: "window",
+    sort: "descend",
+    min: 0,
+    max: Infinity
   });
   const chart = await drawChart(dataSet);
-  return chart
+  return chart;
 };
 
-(async() => {
-let mainChart = await start();
-console.log(mainChart)
-let settings = {
-  date: "2019-10-15",
-  min: 0,
-  type: "window",
-  unit: "hours"
-}
-const filterMinInput = document.getElementById("input-min")
-const filterMaxInput = document.getElementById("input-max")
-const fileDateInput = document.getElementById("input-date")
-const radioTypeWindow = document.getElementById("input-window")
-const radioTypeProcess = document.getElementById("input-process")
-const radioUnitsHours = document.getElementById("input-hours")
-const radioUnitsMinutes = document.getElementById("input-minutes")
-filterMinInput.addEventListener("change", () => {
-  settings.min = parseInt(filterMinInput.value) 
-  redrawMainChart(mainChart, settings)
-})
-filterMaxInput.addEventListener("change", () => {
-  settings.max = parseInt(filterMaxInput.value) 
-  redrawMainChart(mainChart, settings)
-})
-fileDateInput.addEventListener("change", () => {
-  settings.date = fileDateInput.value
-  redrawMainChart(mainChart, settings)
-})
-radioTypeWindow.addEventListener("change", () => {
-  settings.type="window" 
-  redrawMainChart(mainChart, settings)
-})
-radioTypeProcess.addEventListener("change", () => {
-  settings.type="process" 
-  redrawMainChart(mainChart, settings)
-})
-radioUnitsHours.addEventListener("change", () => {
-  settings.units="hours" 
-  redrawMainChart(mainChart, settings)
-})
-radioUnitsMinutes.addEventListener("change", () => {
-  settings.units="minutes"
-  redrawMainChart(mainChart, settings)
-})
-})()
+function formatDate(date) {
+  var d = new Date(date),
+    month = "" + (d.getMonth() + 1),
+    day = "" + d.getDate(),
+    year = d.getFullYear();
 
+  if (month.length < 2) month = "0" + month;
+  if (day.length < 2) day = "0" + day;
+
+  return [year, month, day].join("-");
+}
+
+function beforePrintHandler() {
+  for (var id in Chart.instances) {
+    Chart.instances[id].resize();
+  }
+}
+
+(async () => {
+  let mainChart = await start();
+  console.log(mainChart);
+  let settings = {
+    date: formatDate(Date.now()),
+    min: 0,
+    type: "window",
+    unit: "hours"
+  };
+  window.addEventListener("beforeprint", beforePrintHandler);
+  const mainChartDiv = document.getElementById("main-chart-container");
+  redrawMainChart(mainChart, settings, mainChartDiv);
+
+  const filterMinInput = document.getElementById("input-min");
+  const filterMaxInput = document.getElementById("input-max");
+  const fileDateInput = document.getElementById("input-date");
+  const radioTypeWindow = document.getElementById("input-window");
+  const radioTypeProcess = document.getElementById("input-process");
+  const radioUnitsHours = document.getElementById("input-hours");
+  const radioUnitsMinutes = document.getElementById("input-minutes");
+  filterMinInput.addEventListener("change", () => {
+    settings.min = parseFloat(filterMinInput.value);
+    redrawMainChart(mainChart, settings, mainChartDiv);
+  });
+  filterMaxInput.addEventListener("change", () => {
+    settings.max = parseFloat(filterMaxInput.value);
+    redrawMainChart(mainChart, settings, mainChartDiv);
+  });
+  fileDateInput.addEventListener("change", () => {
+    settings.date = fileDateInput.value;
+    redrawMainChart(mainChart, settings, mainChartDiv);
+  });
+  radioTypeWindow.addEventListener("change", () => {
+    settings.type = "window";
+    redrawMainChart(mainChart, settings, mainChartDiv);
+  });
+  radioTypeProcess.addEventListener("change", () => {
+    settings.type = "process";
+    redrawMainChart(mainChart, settings, mainChartDiv);
+  });
+  radioUnitsHours.addEventListener("change", () => {
+    settings.units = "hours";
+    redrawMainChart(mainChart, settings, mainChartDiv);
+  });
+  radioUnitsMinutes.addEventListener("change", () => {
+    settings.units = "minutes";
+    redrawMainChart(mainChart, settings, mainChartDiv);
+  });
+})();

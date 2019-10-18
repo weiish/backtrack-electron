@@ -1,13 +1,14 @@
 #content{
     display: flex;
     flex-direction: row;
-    flex-wrap: wrap;
+    height: 100%;
 }
 
 .col {
     flex: 1 1 auto;
     display: flex;
     flex-direction: column;
+    height: 100%;
 }
 
 #col1{
@@ -18,8 +19,16 @@
     background-color: rgb(172, 51, 51);
 }
 
-#main-chart-container {
-    overflow: auto;
+#main-chart-overflow-container {
     flex: 1 1 auto;
+    overflow: auto;
+    max-height: 80%;
+    min-height: 80%;
+}
+#main-chart-container {
+    position: relative;
 }
 
+#main-chart {
+    position: relative;
+}

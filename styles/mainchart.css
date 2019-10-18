@@ -1,0 +1,10 @@
+#main-chart-container {
+    overflow: auto;
+    flex: 1 1 auto;
+    height: 100%;
+}
+
+#main-chart {
+    width: 100%;
+    height: 100%;
+}

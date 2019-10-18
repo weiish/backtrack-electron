@@ -16,6 +16,7 @@
     <link rel="stylesheet" type="text/css" href="./styles/navbar.css">
     <link rel="stylesheet" type="text/css" href="./styles/content.css">
     <link rel="stylesheet" type="text/css" href="./styles/settings.css">
+    <link rel="stylesheet" type="text/css" href="./styles/mainchart.css">
 </head>
 
 <body>
@@ -43,9 +44,6 @@
         <div id="content">
             <div class="col" id="col1">
                 <div id="settings">
-                    <div class="setting-section">
-                        <h1>Settings</h1>
-                    </div>
                     <div id="date-selector" class="setting-section">
                         <h2>Date</h2>
                         <input id="input-date" type="date">
@@ -85,19 +83,30 @@
                         </div>
                     </div>
                 </div>
-                <div id="main-chart-container">
-                    <canvas id="main-chart"></canvas>
+                <div id="main-chart-overflow-container">
+                    <div id="main-chart-container">
+                        <canvas id="main-chart"></canvas>
+                    </div>
                 </div>
+                
             </div>
 
             <div class="col" id="col2">
-                <div id="summary-chart-container">
-                    <h1>Summary Chart</h1>
-                    <canvas id="summary-chart"></canvas>
+                <div id="summary-chart-section">
+                    <div id="summary-chart-container">
+                        <canvas id="summary-chart"></canvas>
+                    </div>
+                    <div id="summary-chart-button-container">
+                        <button>Process</button>
+                        <button>Category</button>
+                    </div>
                 </div>
-                <div id="table-container">
-                    <h1>Table</h1>
+                <div id="table-section">
+                    <div id="table-container">
+                        <h1>Table</h1>
+                    </div>
                 </div>
+                
             </div>
         </div>
 

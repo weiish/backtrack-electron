@@ -1,4 +1,6 @@
 #settings {
+    max-height: 20%;
+    min-height: 20%;
     font-size: 2vh;
     display: flex;
     flex-direction: row;
